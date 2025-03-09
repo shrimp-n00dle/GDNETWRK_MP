@@ -38,7 +38,6 @@ public class PlayerMovement : NetworkBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-       // this.enabled = false;
     }
 
     // Update is called once per frame
@@ -51,12 +50,6 @@ public class PlayerMovement : NetworkBehaviour
         //  rb.velocity = new Vector2(moveDirection.x * speed, moveDirection.y * speed); 
         setDirection();
         movePlayer();
-
-        //var behaviours = GetComponents<NetworkBehaviour>();
-        //for (int i = 0; i < behaviours.Length; i++)
-        //{
-        //    Debug.Log($"[{i}] {behaviours[i].GetType().Name}");
-        //}
     }
 
     private void setDirection()
@@ -99,32 +92,30 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        if (other.gameObject.CompareTag("Player")) // Adjust tag as needed
-        {
-
-            if (IsServer)
-            {
-                //Destroy the other player immediately if on the server
-                other.gameObject.GetComponent<NetworkObject>().Despawn(true);
-            }
-            else
-            {
-                //If not the server, request the server to despawn the object
-                RequestDestroyServerRpc(other.gameObject.GetComponent<NetworkObject>());
-            }
-        }
-    }
+    //private void OnCollisionEnter2D(Collision2D other)
+    //{
+    //   // if (PlayerHasEatenFruit) //not yet implemented..ideally, player will be only defeat the other player while
+    //                                        //mystical fruit is in effect
+    //   // {
+    //        if (other.gameObject.CompareTag("Player")) // Adjust tag as needed
+    //        {
+    //            NetworkObject netPlayer = other.gameObject.GetComponent<NetworkObject>();
+    //        // Debug.Log($"Player {player.OwnerClientId} Despawned");
+    //        //other.gameObject.
+    //            RequestDestroyServerRpc(netPlayer);
+    //            this.enabled = false; //game over when player has successfully collided with the other player
+    //        }
+    //    //}
+    //}
 
 
-    [ServerRpc(RequireOwnership = false)] 
-    private void RequestDestroyServerRpc(NetworkObjectReference playerObjectRef)
-    {
-        if (playerObjectRef.TryGet(out NetworkObject playerObject))
-        {
-            playerObject.Despawn(true);
-        }
-    }
+    //[ServerRpc(RequireOwnership = false)] 
+    //private void RequestDestroyServerRpc(NetworkObjectReference playerObjectRef)
+    //{
+    //    if (playerObjectRef.TryGet(out NetworkObject playerObject))
+    //    {
+    //        playerObject.Despawn(true);
+    //    }
+    //}
 
 }

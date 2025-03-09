@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
+
+//not being used atm
 public class PlayerNetwork : NetworkBehaviour
 {
     private readonly NetworkVariable<Vector3> netPosition = new (writePerm: NetworkVariableWritePermission.Owner);
     private readonly NetworkVariable<Quaternion> netRotation = new (writePerm: NetworkVariableWritePermission.Owner);
+   // private readonly 
 
     // Start is called before the first frame update
     void Start()
