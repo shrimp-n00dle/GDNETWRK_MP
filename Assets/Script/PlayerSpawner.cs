@@ -1,9 +1,10 @@
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerSpawner : MonoBehaviour
+public class PlayerSpawner : NetworkBehaviour
 {
     public static PlayerSpawner Instance;
 
@@ -13,7 +14,14 @@ public class PlayerSpawner : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject); 
+        }
         NetworkManager.Singleton.AddNetworkPrefab(playerPrefab);
     }
 
@@ -30,40 +38,21 @@ public class PlayerSpawner : MonoBehaviour
         return spawnPoint;
     }
 
-    //public GameObject GetPlayerPrefab()
-    //{
-    //    return playerPrefab;
-    //}
+    [ClientRpc]
+    public void ModifyPlayerMovementsClientRpc()
+    {
+        if (!IsServer) return;
+
+        if(NetworkManager.Singleton.ConnectedClients.Count == 2) {
+            GameObject localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
+            localPlayer.GetComponent<PlayerMovement>().enabled = true;
+        }
+        else
+        {
+            GameObject localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
+            localPlayer.GetComponent<PlayerMovement>().enabled = false;
+        }
+        
+    }
+
 }
-
-//using UnityEngine;
-//using System.Collections.Generic;
-
-//public class PlayerSpawner : MonoBehaviour
-//{
-//    public static PlayerSpawner Instance;
-//    [SerializeField] private List<Transform> spawnPoints = new List<Transform>();
-//    private int spawnIndex = 0;
-
-//    private void Awake()
-//    {
-//        Instance = this;
-//    }
-
-//    public Transform GetNextSpawnPoint()
-//    {
-//        if (spawnPoints.Count == 0)
-//        {
-//            Debug.LogError("No spawn points assigned!");
-//            return null;
-//        }
-
-//        Transform spawnPoint = spawnPoints[spawnIndex];
-
-//        // Move to the next spawn point for the next player
-//        spawnIndex = (spawnIndex + 1) % spawnPoints.Count;
-
-//        Debug.Log($"Assigned spawn point {spawnIndex} at {spawnPoint.position}");
-//        return spawnPoint;
-//    }
-//}

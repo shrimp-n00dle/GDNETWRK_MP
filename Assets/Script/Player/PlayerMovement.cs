@@ -13,10 +13,13 @@ public class PlayerMovement : NetworkBehaviour
     private Vector2 moveDirection = Vector2.zero;
     private string direction;
 
+
     public override void OnNetworkSpawn()
     {
         //if (!IsOwner) Destroy(this);
         if(!IsOwner) enabled = false;
+
+        //this.enabled = false;
 
     }
 
@@ -35,11 +38,14 @@ public class PlayerMovement : NetworkBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+       // this.enabled = false;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!IsOwner) return;
+
         moveDirection = playerControls.ReadValue<Vector2>();
 
         //  rb.velocity = new Vector2(moveDirection.x * speed, moveDirection.y * speed); 
@@ -90,6 +96,34 @@ public class PlayerMovement : NetworkBehaviour
                 rb.velocity = new Vector2(-1 * speed, 0);
                 break;
 
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Player")) // Adjust tag as needed
+        {
+
+            if (IsServer)
+            {
+                //Destroy the other player immediately if on the server
+                other.gameObject.GetComponent<NetworkObject>().Despawn(true);
+            }
+            else
+            {
+                //If not the server, request the server to despawn the object
+                RequestDestroyServerRpc(other.gameObject.GetComponent<NetworkObject>());
+            }
+        }
+    }
+
+
+    [ServerRpc(RequireOwnership = false)] 
+    private void RequestDestroyServerRpc(NetworkObjectReference playerObjectRef)
+    {
+        if (playerObjectRef.TryGet(out NetworkObject playerObject))
+        {
+            playerObject.Despawn(true);
         }
     }
 
