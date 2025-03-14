@@ -84,6 +84,11 @@ public class Player : NetworkBehaviour
 			}
 
 		}
+		else
+		{
+            //if (other.gameObject.CompareTag("Ghost"))
+
+        }
 
 		if (other.gameObject.CompareTag("Fruit"))
 		{
@@ -96,6 +101,7 @@ public class Player : NetworkBehaviour
 				RequestDestroyServerRpc(netFruit);
 			}
 		}
+
 
 	}
 

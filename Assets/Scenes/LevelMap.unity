@@ -4988,7 +4988,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1079177706}
   m_Layer: 0
-  m_Name: Fruit Spawn Points
+  m_Name: Fruit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

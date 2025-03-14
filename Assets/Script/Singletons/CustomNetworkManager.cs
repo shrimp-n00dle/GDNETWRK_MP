@@ -49,6 +49,10 @@ public class CustomNetworkManager : NetworkManager
         {
             PlayerSpawner.Instance.EnableAllPlayerMovementsClientRpc();
         }
+        else
+        {
+            PlayerSpawner.Instance.DisableAllPlayerMovementsClientRpc();
+        }
 
     }
 

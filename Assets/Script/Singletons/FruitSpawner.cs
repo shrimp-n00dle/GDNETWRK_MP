@@ -42,19 +42,6 @@ public class FruitSpawner : NetworkBehaviour
 
     }
 
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private Transform GetRandomSpawnPoint()
     {
         int randomIndex = Random.Range(0, spawnPoints.Count);
