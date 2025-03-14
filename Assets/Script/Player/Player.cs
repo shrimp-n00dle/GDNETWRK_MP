@@ -8,15 +8,21 @@ using UnityEngine;
 public class Player : NetworkBehaviour
 {
 	[Header("PlayerInfo")]
-	//[SerializeField] private bool hasMysticFruit = false;
 	[SerializeField] private int points = 0;
 
-	//private readonly NetworkVariable<bool> hasMysticFruit = new(writePerm: NetworkVariableWritePermission.Owner);
-	private NetworkVariable<bool> hasMysticFruit = new NetworkVariable<bool>(
+    //private readonly NetworkVariable<bool> hasMysticFruit = new(writePerm: NetworkVariableWritePermission.Owner);
+    [SerializeField]
+    private NetworkVariable<bool> hasMysticFruit = new NetworkVariable<bool>(
 		false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
 	);
 
-	private PlayerMovement playerMovement;
+	[SerializeField] private int mysticPowerDuration = 15;
+
+    private PlayerMovement playerMovement;
+	private float elapsedTime = 0f;
+
+	//public bool showUI = false;
+	//public string UIText;
 
 	private void Start()
 	{
@@ -27,11 +33,20 @@ public class Player : NetworkBehaviour
 	{
 		//consists timer for the hasmysticfruit if it is in effect
 
-		if (IsServer)
+		//if (IsServer)
+		//{
+		//	Debug.Log(this.hasMysticFruit.Value);
+		//}   }
+
+		if (this.hasMysticFruit.Value && IsOwner)
 		{
-			Debug.Log(this.hasMysticFruit.Value);
-		}
-		
+			this.elapsedTime += Time.deltaTime;
+            //Debug.Log("BUFF: " + (int)elapsedTime);
+            if (this.elapsedTime >= this.mysticPowerDuration)
+			{
+                RequestDisableFruitBuffServerRpc();
+            }
+        }
 	}
 
 	public bool HasMysticFruit  
@@ -62,48 +77,97 @@ public class Player : NetworkBehaviour
 					RequestDestroyServerRpc(netPlayer);
 					playerMovement.enabled = false; //game over when player has successfully collided with the other player
 
+					//string text = "Player " + OwnerClientId + (int)1 + " won!";
+                   // RequestShoGUIServerRpc(text);
 
-				}
+                }
 			}
 
 		}
-
 
 		if (other.gameObject.CompareTag("Fruit"))
 		{
-		   // Debug.Log("touch fruit");
-			if(IsOwner)
+			// Debug.Log("touch fruit");
+			if (IsOwner)
 			{
 				RequestEnableFruitBuffServerRpc();
+
+				NetworkObject netFruit = other.gameObject.GetComponent<NetworkObject>();
+				RequestDestroyServerRpc(netFruit);
 			}
 		}
-		
+
 	}
 
 
-	[ServerRpc(RequireOwnership = false)]
+    [ServerRpc(RequireOwnership = false)]
 	private void RequestDestroyServerRpc(NetworkObjectReference playerObjectRef)
 	{
 		if (playerObjectRef.TryGet(out NetworkObject playerObject))
 		{
 			playerObject.Despawn(true);
-		}
+        }
 	}
 
 	[ServerRpc(RequireOwnership = false)]
 	private void RequestEnableFruitBuffServerRpc()
 	{
 		this.hasMysticFruit.Value = true; // Server updates the value
-		Debug.Log($"Player {OwnerClientId} picked up a Mystical Fruit!");
+        Debug.Log($"Player {OwnerClientId+1} picked up a Mystical Fruit!");
 	}
 
-	[ClientRpc] 
-	private void DestroyAllPlayersClientRpc()
-	{
-		NetworkObject localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject;
-		localPlayer.Despawn(true);
-		
-	}
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestDisableFruitBuffServerRpc()
+    {
+        this.hasMysticFruit.Value = false; // Server updates the value
+		this.elapsedTime = 0f;
+        Debug.Log($"Player {OwnerClientId+1}'s mystic fruit power timed out!");
+    }
+
+
+
+	//ignore functions below
+
+    //   [ClientRpc] 
+    //private void DestroyAllPlayersClientRpc()
+    //{
+    //	NetworkObject localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject;
+    //	localPlayer.Despawn(true);
+
+    //}
+    //[ServerRpc(RequireOwnership = false)]
+    //private void RequestShoGUIServerRpc(string text)
+    //{
+    //	ShowGUIClientRpc(text);
+
+    //   }
+
+
+    //  private void OnGUI()
+    //  {
+    //if (this.showUI)
+    //{
+    //	GUIStyle textStyle = new GUIStyle();
+    //	textStyle.fontSize = 20;
+    //	textStyle.normal.textColor = Color.white;
+    //	textStyle.alignment = TextAnchor.MiddleCenter;
+
+    //	Rect textRect = new Rect(10, 10, 300, 50);
+    //          //string text = "Player " + OwnerClientId + 1 + " won!";
+    //          //GUI.Label(textRect, this.UIText, textStyle);
+    //        //  GUI.Label(textRect, "AAAAA", textStyle);
+    //      }
+    //  }
+
+
+    //[ClientRpc(RequireOwnership = false)]
+    //private void ShowGUIClientRpc(string text)
+    //{
+    //       NetworkObject localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject;
+    //	Debug.Log("hahahaha");
+    //	localPlayer.GetComponent<Player>().showUI = true;
+    //       localPlayer.GetComponent<Player>().UIText = text;
+    //   }
 
 }
 

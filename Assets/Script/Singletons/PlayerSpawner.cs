@@ -46,6 +46,9 @@ public class PlayerSpawner : NetworkBehaviour
         if(NetworkManager.Singleton.ConnectedClients.Count == 2) {
             GameObject localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
             localPlayer.GetComponent<PlayerMovement>().enabled = true;
+
+            //for testing only:
+            FruitSpawner.Instance.SpawnMysticFruit();
         }
         else
         {
@@ -53,6 +56,27 @@ public class PlayerSpawner : NetworkBehaviour
             localPlayer.GetComponent<PlayerMovement>().enabled = false;
         }
         
+    }
+
+    [ClientRpc]
+    public void EnableAllPlayerMovementsClientRpc()
+    {
+        if (!IsServer) return;
+
+            GameObject localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
+            localPlayer.GetComponent<PlayerMovement>().enabled = true;
+
+            //for testing only:
+            FruitSpawner.Instance.SpawnMysticFruit();
+    }
+
+    [ClientRpc]
+    public void DisableAllPlayerMovementsClientRpc()
+    {
+        if(!IsServer) return;
+
+        GameObject localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
+        localPlayer.GetComponent<PlayerMovement>().enabled = false;
     }
 
 }

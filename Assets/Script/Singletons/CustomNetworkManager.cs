@@ -44,8 +44,11 @@ public class CustomNetworkManager : NetworkManager
         playerInstance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
  
         Debug.Log($"Client {clientId} connected. Total clients: {NetworkManager.Singleton.ConnectedClients.Count}");
-        PlayerSpawner.Instance.ModifyPlayerMovementsClientRpc();
 
+        if (NetworkManager.Singleton.ConnectedClients.Count == 2)
+        {
+            PlayerSpawner.Instance.EnableAllPlayerMovementsClientRpc();
+        }
 
     }
 
