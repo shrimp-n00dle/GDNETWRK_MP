@@ -1,3 +1,4 @@
+using ParrelSync.NonCore;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -8,7 +9,12 @@ using UnityEngine;
 public class Player : NetworkBehaviour
 {
 	[Header("PlayerInfo")]
-	[SerializeField] private int points = 0;
+	//[SerializeField] private int points = 0;
+
+    [SerializeField]
+    private NetworkVariable<int> points = new NetworkVariable<int>(
+        0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
+    );
 
     //private readonly NetworkVariable<bool> hasMysticFruit = new(writePerm: NetworkVariableWritePermission.Owner);
     [SerializeField]
@@ -57,11 +63,25 @@ public class Player : NetworkBehaviour
 
 	public int Points
 	{
-		get { return points; }
-		set { points = value; }
+		get { return points.Value; }
+		set { points.Value = value; }
 	}
 
-	private void OnCollisionEnter2D(Collision2D other)
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer || IsClient)
+        {
+            points.OnValueChanged += OnPointsChanged;
+          //  UIManager.Instance?.UpdatePlayerPointsUI(GetPlayerIndex(), points.Value); // Initial update
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        points.OnValueChanged -= OnPointsChanged;
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
 	{
 		 if (this.hasMysticFruit.Value) //not yet implemented..ideally, player will be only defeat the other player while
 
@@ -74,7 +94,7 @@ public class Player : NetworkBehaviour
 					Debug.Log("collided other player with fruit");
 					NetworkObject netPlayer = other.gameObject.GetComponent<NetworkObject>();
 
-					RequestDestroyServerRpc(netPlayer);
+					RequestDestroyObjectServerRpc(netPlayer);
 					playerMovement.enabled = false; //game over when player has successfully collided with the other player
 
 					//string text = "Player " + OwnerClientId + (int)1 + " won!";
@@ -90,24 +110,41 @@ public class Player : NetworkBehaviour
 
         }
 
-		if (other.gameObject.CompareTag("Fruit"))
-		{
-			// Debug.Log("touch fruit");
-			if (IsOwner)
-			{
-				RequestEnableFruitBuffServerRpc();
+        if (other.gameObject.CompareTag("Fruit"))
+        {
+            // Debug.Log("touch fruit");
+            if (IsOwner)
+            {
+                RequestEnableFruitBuffServerRpc();
 
-				NetworkObject netFruit = other.gameObject.GetComponent<NetworkObject>();
-				RequestDestroyServerRpc(netFruit);
-			}
-		}
+                NetworkObject netFruit = other.gameObject.GetComponent<NetworkObject>();
+                RequestDestroyObjectServerRpc(netFruit);
+            }
+        }
+
+        if (other.gameObject.CompareTag("Orb"))
+        {
+            if (IsOwner)
+            {
+                RequestAddPointToPlayerServerRpc();
+                NetworkObject netOrb = other.gameObject.GetComponent<NetworkObject>();
+                RequestDestroyObjectServerRpc(netOrb);
+             //   RequestUpdatePlayerPointsUIClientRpc();
+            }
+        }
 
 
-	}
+    }
+
+    private void OnPointsChanged(int oldValue, int newValue)
+    {
+        int playerIndex = (int)OwnerClientId + 1;
+        UIManager.Instance?.UpdatePlayerPointsUI(playerIndex, newValue);
+    }
 
 
     [ServerRpc(RequireOwnership = false)]
-	private void RequestDestroyServerRpc(NetworkObjectReference playerObjectRef)
+	private void RequestDestroyObjectServerRpc(NetworkObjectReference playerObjectRef)
 	{
 		if (playerObjectRef.TryGet(out NetworkObject playerObject))
 		{
@@ -128,6 +165,21 @@ public class Player : NetworkBehaviour
         this.hasMysticFruit.Value = false; // Server updates the value
 		this.elapsedTime = 0f;
         Debug.Log($"Player {OwnerClientId+1}'s mystic fruit power timed out!");
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestAddPointToPlayerServerRpc()
+    {
+        this.points.Value += 1;
+        Debug.Log($"Player {OwnerClientId + 1}' nommed an orb." + $"Total: {this.points.Value}");
+
+        
+    }
+
+    [ClientRpc(RequireOwnership = false)]
+    private void RequestUpdatePlayerPointsUIClientRpc()
+    {
+        UIManager.Instance.UpdatePlayerPointsUI((int)OwnerClientId + 1, this.points.Value);
     }
 
 

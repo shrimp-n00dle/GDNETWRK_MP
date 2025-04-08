@@ -10,6 +10,7 @@ public class PlayerSpawner : NetworkBehaviour
 
     [SerializeField] private List<Transform> spawnPoints = new List<Transform>();
     [SerializeField] public GameObject playerPrefab;
+
     private int spawnIndex = 0;
 
     private void Awake()
@@ -24,6 +25,7 @@ public class PlayerSpawner : NetworkBehaviour
         }
         NetworkManager.Singleton.AddNetworkPrefab(playerPrefab);
     }
+
 
     public Transform GetNextSpawnPoint()
     {
@@ -48,7 +50,7 @@ public class PlayerSpawner : NetworkBehaviour
             localPlayer.GetComponent<PlayerMovement>().enabled = true;
 
             //for testing only:
-            FruitSpawner.Instance.SpawnMysticFruit();
+          //  FruitSpawner.Instance.SpawnMysticFruit();
         }
         else
         {
@@ -67,7 +69,7 @@ public class PlayerSpawner : NetworkBehaviour
             localPlayer.GetComponent<PlayerMovement>().enabled = true;
 
             //for testing only:
-            FruitSpawner.Instance.SpawnMysticFruit();
+           // FruitSpawner.Instance.SpawnMysticFruit();
     }
 
     [ClientRpc]

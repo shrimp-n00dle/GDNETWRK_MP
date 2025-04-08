@@ -9,7 +9,7 @@ public class FruitSpawner : NetworkBehaviour
 {
     public static FruitSpawner Instance;
     [SerializeField] public GameObject fruitPrefab;
-    [SerializeField] private GameObject spawn;
+    [SerializeField] private GameObject spawnParent;
     private List<Transform> spawnPoints = new List<Transform>();
 
 
@@ -25,9 +25,9 @@ public class FruitSpawner : NetworkBehaviour
         }
         NetworkManager.Singleton.AddNetworkPrefab(fruitPrefab);
 
-        for(int i = 0; i < spawn.transform.childCount; i++)
+        for(int i = 0; i < spawnParent.transform.childCount; i++)
         {
-            spawnPoints.Add(spawn.transform.GetChild(i));
+            spawnPoints.Add(spawnParent.transform.GetChild(i));
         }
         
     }
