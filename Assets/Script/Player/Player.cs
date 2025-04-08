@@ -22,7 +22,12 @@ public class Player : NetworkBehaviour
 		false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
 	);
 
-	[SerializeField] private int mysticPowerDuration = 15;
+    [SerializeField]
+    private NetworkVariable<int> buffDuration = new NetworkVariable<int>(
+        0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
+    );
+
+    [SerializeField] private int mysticPowerDuration = 15;
 
     private PlayerMovement playerMovement;
 	private float elapsedTime = 0f;
@@ -47,6 +52,10 @@ public class Player : NetworkBehaviour
 		if (this.hasMysticFruit.Value && IsOwner)
 		{
 			this.elapsedTime += Time.deltaTime;
+            int currentDuration = (int)this.elapsedTime - mysticPowerDuration;
+
+            RequestModifyBuffDurationServerRpc(Mathf.Abs(currentDuration));
+
             //Debug.Log("BUFF: " + (int)elapsedTime);
             if (this.elapsedTime >= this.mysticPowerDuration)
 			{
@@ -72,9 +81,12 @@ public class Player : NetworkBehaviour
         if (IsServer || IsClient)
         {
             points.OnValueChanged += OnPointsChanged;
+            buffDuration.OnValueChanged += OnBuffDurationChanged; 
           //  UIManager.Instance?.UpdatePlayerPointsUI(GetPlayerIndex(), points.Value); // Initial update
         }
     }
+
+    
 
     public override void OnNetworkDespawn()
     {
@@ -142,6 +154,13 @@ public class Player : NetworkBehaviour
         UIManager.Instance?.UpdatePlayerPointsUI(playerIndex, newValue);
     }
 
+    private void OnBuffDurationChanged(int oldValue, int newValue)
+    {
+        int playerIndex = (int)OwnerClientId + 1;
+        UIManager.Instance?.UpdatePlayerBuffDurationUI(playerIndex, newValue);
+
+    }
+
 
     [ServerRpc(RequireOwnership = false)]
 	private void RequestDestroyObjectServerRpc(NetworkObjectReference playerObjectRef)
@@ -156,6 +175,8 @@ public class Player : NetworkBehaviour
 	private void RequestEnableFruitBuffServerRpc()
 	{
 		this.hasMysticFruit.Value = true; // Server updates the value
+        this.buffDuration.Value = 15;
+       // testDebugClientRpc();
         Debug.Log($"Player {OwnerClientId+1} picked up a Mystical Fruit!");
 	}
 
@@ -172,14 +193,24 @@ public class Player : NetworkBehaviour
     {
         this.points.Value += 1;
         Debug.Log($"Player {OwnerClientId + 1}' nommed an orb." + $"Total: {this.points.Value}");
+    }
 
-        
+    [ServerRpc]
+    public void RequestModifyBuffDurationServerRpc(int duration)
+    {
+        buffDuration.Value = duration;
     }
 
     [ClientRpc(RequireOwnership = false)]
     private void RequestUpdatePlayerPointsUIClientRpc()
     {
         UIManager.Instance.UpdatePlayerPointsUI((int)OwnerClientId + 1, this.points.Value);
+    }
+
+    [ClientRpc(RequireOwnership = false)]
+    private void testDebugClientRpc()
+    {
+        Debug.Log("Ena4 hjuhuhuhdskh " + this.points.Value);
     }
 
 

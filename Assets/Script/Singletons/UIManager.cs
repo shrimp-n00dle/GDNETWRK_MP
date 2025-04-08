@@ -7,10 +7,13 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
-    [Header("UI Elements")]
+    [Header("Player 1 Elements")]
     [SerializeField] private TextMeshProUGUI P1PointsUI;
+    [SerializeField] private TextMeshProUGUI P1BuffDurationUI;
 
+    [Header("Player 2 Elements")]
     [SerializeField] private TextMeshProUGUI P2PointsUI;
+    [SerializeField] private TextMeshProUGUI P2BuffDurationUI;
 
     private void Start()
     {
@@ -33,6 +36,19 @@ public class UIManager : MonoBehaviour
                 break;
             case 2:
                 P2PointsUI.text = points.ToString();
+                break;
+        }
+    }
+
+    public void UpdatePlayerBuffDurationUI(int player, int buffDuration)
+    {
+        switch (player)
+        {
+            case 1:
+                P1BuffDurationUI.text = buffDuration.ToString();
+                break;
+            case 2:
+                P2BuffDurationUI.text = buffDuration.ToString();
                 break;
         }
     }
