@@ -15,6 +15,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI P2PointsUI;
     [SerializeField] private TextMeshProUGUI P2BuffDurationUI;
 
+    [Header("Timer Elements")]
+    [SerializeField] private TextMeshProUGUI TimerUI;
+
     private void Start()
     {
         if (Instance == null)
@@ -51,5 +54,10 @@ public class UIManager : MonoBehaviour
                 P2BuffDurationUI.text = buffDuration.ToString();
                 break;
         }
+    }
+
+    public void UpdateGameTimer(string timerLeft)
+    {
+        TimerUI.text = timerLeft;
     }
 }

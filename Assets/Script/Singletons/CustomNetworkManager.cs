@@ -48,7 +48,8 @@ public class CustomNetworkManager : NetworkManager
         if (NetworkManager.Singleton.ConnectedClients.Count == 2)
         {
             PlayerSpawner.Instance.EnableAllPlayerMovementsClientRpc();
-            FruitSpawner.Instance.SpawnMysticFruit();
+        //    FruitSpawner.Instance.SpawnMysticFruit();
+            GameManager.Instance.HasTimerStarted = true;
             OrbSpawner.Instance.SpawnAllOrbs();
         }
         else

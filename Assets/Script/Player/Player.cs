@@ -12,7 +12,7 @@ public class Player : NetworkBehaviour
 	//[SerializeField] private int points = 0;
 
     [SerializeField]
-    private NetworkVariable<int> points = new NetworkVariable<int>(
+    public NetworkVariable<int> points = new NetworkVariable<int>(
         0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
     );
 
@@ -141,6 +141,9 @@ public class Player : NetworkBehaviour
                 RequestAddPointToPlayerServerRpc();
                 NetworkObject netOrb = other.gameObject.GetComponent<NetworkObject>();
                 RequestDestroyObjectServerRpc(netOrb);
+
+                //if(IsOw) 
+                    FruitSpawner.Instance.CheckAllPlayerPoints();
              //   RequestUpdatePlayerPointsUIClientRpc();
             }
         }
@@ -195,7 +198,7 @@ public class Player : NetworkBehaviour
         Debug.Log($"Player {OwnerClientId + 1}' nommed an orb." + $"Total: {this.points.Value}");
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void RequestModifyBuffDurationServerRpc(int duration)
     {
         buffDuration.Value = duration;

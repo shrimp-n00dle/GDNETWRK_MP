@@ -47,4 +47,42 @@ public class FruitSpawner : NetworkBehaviour
         int randomIndex = Random.Range(0, spawnPoints.Count);
         return spawnPoints[randomIndex];
     }
+
+    public void CheckAllPlayerPoints()
+    {
+        if(!IsServer) return;
+
+        int P1points = 0;
+        int P2points = 0;
+
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            ulong clientId = client.ClientId;
+            GameObject playerObject = client.PlayerObject?.gameObject;
+
+            if (playerObject != null)
+            {
+                Player playerScript = playerObject.GetComponent<Player>();
+                int playerPoints = playerScript.points.Value;
+
+                if (client.ClientId == 0)
+                {
+                    P1points = playerPoints;
+                }
+                else
+                {
+                    P2points = playerPoints;
+                }
+
+              //  Debug.Log($"Player {clientId} has {playerPoints} points.");
+            }
+        }
+
+        // Debug.Log("Total points: " +  (P1points + P2points));
+
+        if ((P1points + P2points) % 15 == 0)
+        {
+            this.SpawnMysticFruit();
+        }
+    }
 }
