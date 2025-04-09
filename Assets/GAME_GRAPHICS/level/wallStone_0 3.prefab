@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 630895666607145550}
   - component: {fileID: 8179662995583173380}
   m_Layer: 0
-  m_Name: wallStone_0 2
+  m_Name: wallStone_0 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: bc4f455a29dca8541ad9fd4e1c032578, type: 3}
+  m_Sprite: {fileID: 4317031259164296274, guid: bc4f455a29dca8541ad9fd4e1c032578, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
