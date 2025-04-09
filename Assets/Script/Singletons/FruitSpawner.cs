@@ -32,21 +32,25 @@ public class FruitSpawner : NetworkBehaviour
         
     }
 
-    public void SpawnMysticFruit()
+    private void SpawnMysticFruit()
     {
         Transform spawnPoint = GetRandomSpawnPoint();
         GameObject fruitInstance = Instantiate(fruitPrefab, spawnPoint.position, spawnPoint.rotation);
         //layerInstance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
         fruitInstance.GetComponent<NetworkObject>().Spawn();
-        Debug.Log("Mystic fruit spawned");
-
+        // Debug.Log("Mystic fruit spawned");
+        ShowFruitSpawnedUIClientRpc();
     }
 
     private Transform GetRandomSpawnPoint()
     {
         int randomIndex = Random.Range(0, spawnPoints.Count);
-        return spawnPoints[randomIndex];
+        Transform transform = spawnPoints[randomIndex];
+        spawnPoints.RemoveAt(randomIndex);
+        return transform;
     }
+
+
 
     public void CheckAllPlayerPoints()
     {
@@ -85,4 +89,24 @@ public class FruitSpawner : NetworkBehaviour
             this.SpawnMysticFruit();
         }
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CheckIfFruitCanSpawnServerRpc()
+    {
+        int P1Points = GameManager.Instance.CheckPlayerPoints(1);
+        int P2Points = GameManager.Instance.CheckPlayerPoints(2);
+
+        if ((P1Points + P2Points) % 15 == 0)
+        {
+            this.SpawnMysticFruit();
+        }
+    }
+
+    [ClientRpc(RequireOwnership = false)]
+    public void ShowFruitSpawnedUIClientRpc()
+    {
+        UIManager.Instance.ShowFruitSpawnPanel = true;
+    }
+
+  
 }

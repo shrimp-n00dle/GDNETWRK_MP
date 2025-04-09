@@ -75,7 +75,7 @@ public class PlayerSpawner : NetworkBehaviour
     [ClientRpc]
     public void DisableAllPlayerMovementsClientRpc()
     {
-        if(!IsServer) return;
+       // if(!IsServer) return;
 
         GameObject localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
         localPlayer.GetComponent<PlayerMovement>().enabled = false;

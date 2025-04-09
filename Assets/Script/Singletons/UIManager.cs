@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class UIManager : MonoBehaviour
 {
@@ -18,6 +19,23 @@ public class UIManager : MonoBehaviour
     [Header("Timer Elements")]
     [SerializeField] private TextMeshProUGUI TimerUI;
 
+    [Header("Winner Elements")]
+    [SerializeField] private GameObject panelWinnerUI;
+    [SerializeField] private TextMeshProUGUI WinnerUI;
+
+    [Header("Fruit Spawn Elements")]
+    [SerializeField] private GameObject panelFruitSpawnUI;
+
+    bool showFruitSpawnPanel = false;
+    float elapsedTime = 0;
+    float fruitDurationUI = 5;
+
+    public bool ShowFruitSpawnPanel
+    {
+        get { return showFruitSpawnPanel; }
+        set {  showFruitSpawnPanel = value; }
+    }
+
     private void Start()
     {
         if (Instance == null)
@@ -27,6 +45,22 @@ public class UIManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void Update()
+    {
+        if(showFruitSpawnPanel)
+        {
+            panelFruitSpawnUI.SetActive(true);
+            elapsedTime += Time.deltaTime;
+
+            if(elapsedTime >= fruitDurationUI)
+            {
+                panelFruitSpawnUI.SetActive(false);
+                showFruitSpawnPanel = false;
+                elapsedTime = 0;
+            }
         }
     }
 
@@ -59,5 +93,14 @@ public class UIManager : MonoBehaviour
     public void UpdateGameTimer(string timerLeft)
     {
         TimerUI.text = timerLeft;
+    }
+
+    public void ShowWinner(string outcome)
+    {
+        if(panelWinnerUI.activeSelf == false)
+        {
+            panelWinnerUI.SetActive(true);
+            WinnerUI.text = outcome;
+        }
     }
 }

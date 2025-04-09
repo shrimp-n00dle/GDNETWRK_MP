@@ -6,9 +6,17 @@ using UnityEngine;
 public class OrbSpawner : NetworkBehaviour
 {
     public static OrbSpawner Instance;
+
     [SerializeField] private GameObject orbPrefab;
     [SerializeField] private GameObject spawnParent;
+
     private List<Transform> spawnPoints = new List<Transform>();
+    private int orbsTotal = 0;
+
+    public int OrbsTotal {  
+        get { return orbsTotal; }
+    }
+    
 
     private void Start()
     {
@@ -23,7 +31,9 @@ public class OrbSpawner : NetworkBehaviour
 
         NetworkManager.Singleton.AddNetworkPrefab(orbPrefab);
 
-        for (int i = 0; i < spawnParent.transform.childCount; i++)
+        orbsTotal = spawnParent.transform.childCount;
+
+        for (int i = 0; i < orbsTotal; i++)
         {
             spawnPoints.Add(spawnParent.transform.GetChild(i));
         }
@@ -48,11 +58,21 @@ public class OrbSpawner : NetworkBehaviour
 
     }
 
+    public void UpdateNumberOfEaten()
+    {
+        //if(numEaten < spawnParent.transform.childCount)
+        //{
+        //    numEaten++;
+        //}
+        //else
+        //{
+        //    Debug.Log("NAKAIN NA LAHAT");
+        //    GameManager.Instance.DetermineWinnerByPointsServerRpc();
+        //}
 
+        //Debug.Log("NUM EATEN: " + numEaten); 
+    }
 
     // Update is called once per frame
-    void Update()
-    {
-        
-    }
+   
 }

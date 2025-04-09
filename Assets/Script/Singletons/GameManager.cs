@@ -58,10 +58,11 @@ public class GameManager : NetworkBehaviour
 
             RequestModifyCurrentTimeServerRpc(Mathf.Abs(currentDuration));
 
-            //if (current <= 0)
-            //{
+            if (Mathf.Abs(currentDuration) <= 0)
+            {
+                DetermineWinnerByPointsServerRpc();
 
-            //}
+            }
         }
     }
 
@@ -72,13 +73,139 @@ public class GameManager : NetworkBehaviour
     }
 
 
+    public int CheckPlayerPoints(int playerID)
+    {
+      //  ulong test = NetworkManager.Singleton.ConnectedClients[(ulong)playerID].ClientId;
+        NetworkClient client = NetworkManager.Singleton.ConnectedClients[(ulong)playerID-1];
+        GameObject playerObject = client.PlayerObject?.gameObject;
+
+        if(playerObject != null)
+        {
+            Player playerScript = playerObject.GetComponent<Player>();
+            int playerPoints = playerScript.points.Value;
+
+            return playerPoints;
+        }
+
+        return 0;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void DetermineWinnerByPointsServerRpc()
+    {
+        string outcome = "";
+
+        int P1Points = CheckPlayerPoints(1);
+        int P2Points = CheckPlayerPoints(2);
+
+        if(P1Points > P2Points)
+        {
+            outcome = "Player 1 wins!";
+        }
+        else if (P2Points > P1Points)
+        {
+            outcome = "Player 2 wins!";
+        }
+        else
+        {
+            outcome = "Draw!";
+        }
+
+        hasTimerStarted = false;
+        PlayerSpawner.Instance.DisableAllPlayerMovementsClientRpc();
+        ShowGameOutcomeUIClientRpc(outcome);
+
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void DetermineWinnerByCollisionServerRpc(int playerID)
+    {
+        string outcome = "";
+
+        switch(playerID)
+        {
+            case 1:
+                outcome = "Player 1 wins!";
+                break;
+            case 2:
+                outcome = "Player 2 wins!";
+                break;
+        }
+
+        hasTimerStarted = false;
+        PlayerSpawner.Instance.DisableAllPlayerMovementsClientRpc();
+        ShowGameOutcomeUIClientRpc(outcome);
+    }
+
+
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CheckIfAllOrbsAreEatenServerRpc()
+    {
+        int P1Points = CheckPlayerPoints(1);
+        int P2Points = CheckPlayerPoints(2);
+
+        if (P1Points + P2Points >= OrbSpawner.Instance.OrbsTotal)
+        {
+            DetermineWinnerByPointsServerRpc();
+        }
+    }
+
+
     [ServerRpc(RequireOwnership = false)]
     public void RequestModifyCurrentTimeServerRpc(int currentTime)
     {
         currentTimeLeft.Value = currentTime;
         //Debug.Log("current: " + current);
-        Debug.Log("Time Left: " + currentTimeLeft.Value);
+      //  Debug.Log("Time Left: " + currentTimeLeft.Value);
     }
+
+    [ClientRpc(RequireOwnership = false)]
+    private void ShowGameOutcomeUIClientRpc(string outcome)
+    {
+        UIManager.Instance.ShowWinner(outcome);
+    }
+
+
+
+
+    //public void CheckAllPlayerPoints()
+    //{
+    //    if (!IsServer) return;
+
+    //    int P1points = 0;
+    //    int P2points = 0;
+
+    //    foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+    //    {
+    //        ulong clientId = client.ClientId;
+    //        GameObject playerObject = client.PlayerObject?.gameObject;
+
+    //        if (playerObject != null)
+    //        {
+    //            Player playerScript = playerObject.GetComponent<Player>();
+    //            int playerPoints = playerScript.points.Value;
+
+    //            if (client.ClientId == 0)
+    //            {
+    //                P1points = playerPoints;
+    //            }
+    //            else
+    //            {
+    //                P2points = playerPoints;
+    //            }
+
+    //            //  Debug.Log($"Player {clientId} has {playerPoints} points.");
+    //        }
+    //    }
+
+    //    // Debug.Log("Total points: " +  (P1points + P2points));
+
+    //    //if ((P1points + P2points) % 15 == 0)
+    //    //{
+    //    //    this.SpawnMysticFruit();
+    //    //}
+    //}
 
 
 

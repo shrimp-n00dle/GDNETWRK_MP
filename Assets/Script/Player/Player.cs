@@ -109,6 +109,8 @@ public class Player : NetworkBehaviour
 					RequestDestroyObjectServerRpc(netPlayer);
 					playerMovement.enabled = false; //game over when player has successfully collided with the other player
 
+                    GameManager.Instance.DetermineWinnerByCollisionServerRpc((int)OwnerClientId + 1);
+
 					//string text = "Player " + OwnerClientId + (int)1 + " won!";
                    // RequestShoGUIServerRpc(text);
 
@@ -141,9 +143,13 @@ public class Player : NetworkBehaviour
                 RequestAddPointToPlayerServerRpc();
                 NetworkObject netOrb = other.gameObject.GetComponent<NetworkObject>();
                 RequestDestroyObjectServerRpc(netOrb);
+                //OrbSpawner.Instance.UpdateNumberOfEaten();
+                GameManager.Instance.CheckIfAllOrbsAreEatenServerRpc();
 
                 //if(IsOw) 
-                    FruitSpawner.Instance.CheckAllPlayerPoints();
+                //  FruitSpawner.Instance.SpawnMysticFruit();
+                FruitSpawner.Instance.CheckIfFruitCanSpawnServerRpc();
+               
              //   RequestUpdatePlayerPointsUIClientRpc();
             }
         }
@@ -195,7 +201,7 @@ public class Player : NetworkBehaviour
     private void RequestAddPointToPlayerServerRpc()
     {
         this.points.Value += 1;
-        Debug.Log($"Player {OwnerClientId + 1}' nommed an orb." + $"Total: {this.points.Value}");
+      //  Debug.Log($"Player {OwnerClientId + 1}' nommed an orb." + $"Total: {this.points.Value}");
     }
 
     [ServerRpc(RequireOwnership = false)]
