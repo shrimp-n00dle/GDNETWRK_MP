@@ -8,14 +8,18 @@ public class GameManager : NetworkBehaviour
 {
     public static GameManager Instance;
 
-    [SerializeField]
+    //[SerializeField]
     public NetworkVariable<int> currentTimeLeft = new NetworkVariable<int>(
         0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
     );
 
+    [SerializeField]
+    private int timerDuration = 90;
+
+
     private bool hasTimerStarted;
     private float elapsedTime = 0;
-    private int timerDuration = 120;
+  //  private int timerDuration = 90;
 
     public bool HasTimerStarted
     {
