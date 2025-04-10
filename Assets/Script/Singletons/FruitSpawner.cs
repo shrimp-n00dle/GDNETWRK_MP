@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.VisualScripting;
-using UnityEditor.PackageManager;
 
 public class FruitSpawner : NetworkBehaviour
 {
@@ -13,7 +12,7 @@ public class FruitSpawner : NetworkBehaviour
     private List<Transform> spawnPoints = new List<Transform>();
 
 
-    private void Awake()
+    private void Start()
     {
         if (Instance == null)
         {

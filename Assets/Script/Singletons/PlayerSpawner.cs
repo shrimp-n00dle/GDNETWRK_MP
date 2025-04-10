@@ -13,7 +13,7 @@ public class PlayerSpawner : NetworkBehaviour
 
     private int spawnIndex = 0;
 
-    private void Awake()
+    private void Start()
     {
         if (Instance == null)
         {

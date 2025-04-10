@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/NetworkTest.unity
     guid: 18915856e4b286b4db64ead7ab77459c
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleRun.unity
     guid: cb5d36e4150dad244aaa2b0bed828bd0
   - enabled: 1

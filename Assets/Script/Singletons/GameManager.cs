@@ -27,7 +27,7 @@ public class GameManager : NetworkBehaviour
         set { hasTimerStarted = value; }
     }
 
-    private void Awake()
+    private void Start()
     {
         if (Instance == null)
         {
