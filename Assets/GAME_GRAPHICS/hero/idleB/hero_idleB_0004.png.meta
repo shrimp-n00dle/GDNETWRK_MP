@@ -143,7 +143,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      hero_idleB_0004_0: 4576906732817927947
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -143,7 +143,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      hero_hitA_0006_0: -7244801604339036586
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

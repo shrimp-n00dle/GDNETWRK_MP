@@ -143,7 +143,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      gem01_0007_0: 5528960632112459323
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
